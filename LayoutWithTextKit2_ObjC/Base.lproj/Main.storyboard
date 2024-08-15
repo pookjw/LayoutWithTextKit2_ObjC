@@ -4,6 +4,7 @@
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23079"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -31,19 +32,124 @@
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <viewLayoutGuide key="safeArea" id="FM0-op-Je2"/>
+                        <gestureRecognizers/>
                         <viewLayoutGuide key="contentLayoutGuide" id="Sdx-dj-CL0"/>
                         <viewLayoutGuide key="frameLayoutGuide" id="rFB-gV-akT"/>
+                        <connections>
+                            <outletCollection property="gestureRecognizers" destination="jQn-QY-J9i" appends="YES" id="4Ba-7D-2iX"/>
+                        </connections>
                     </scrollView>
                     <navigationItem key="navigationItem" title="Layout Text with TextKit 2" id="Awr-xb-bLG">
-                        <barButtonItem key="rightBarButtonItem" image="text.bubble" catalog="system" id="SUO-zu-6Zy"/>
+                        <barButtonItem key="rightBarButtonItem" image="text.bubble" catalog="system" id="SUO-zu-6Zy">
+                            <connections>
+                                <action selector="toggleComments:" destination="GGd-1C-2Gj" id="XQP-Hu-qgA"/>
+                            </connections>
+                        </barButtonItem>
                     </navigationItem>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="cdB-dg-XNe" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+                <pongPressGestureRecognizer allowableMovement="10" minimumPressDuration="0.5" id="jQn-QY-J9i">
+                    <connections>
+                        <action selector="handleLongPress:" destination="ZFL-1w-G6n" id="b1G-jR-uen"/>
+                    </connections>
+                </pongPressGestureRecognizer>
             </objects>
             <point key="canvasLocation" x="482" y="27"/>
         </scene>
+        <!--Comment Popover View Controller-->
+        <scene sceneID="G9d-34-7Fe">
+            <objects>
+                <viewController storyboardIdentifier="CommentPopoverViewController" id="IvR-2b-9u7" customClass="CommentPopoverViewController" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="eZq-a6-UX0">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="jul-FT-mMo">
+                                <rect key="frame" x="16" y="71" width="361" height="34"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits"/>
+                                <connections>
+                                    <outlet property="delegate" destination="IvR-2b-9u7" id="UV2-vy-cKx"/>
+                                </connections>
+                            </textField>
+                            <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="YBS-k3-ljP">
+                                <rect key="frame" x="16" y="112.99999999999999" width="361" height="34.333333333333329"/>
+                                <subviews>
+                                    <button opaque="NO" tag="1" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="9Ab-MX-GQ8">
+                                        <rect key="frame" x="0.0" y="0.0" width="84.333333333333329" height="34.333333333333336"/>
+                                        <state key="normal" title="Button"/>
+                                        <buttonConfiguration key="configuration" style="filled" image="hand.thumbsup.fill" catalog="system">
+                                            <color key="baseForegroundColor" systemColor="systemYellowColor"/>
+                                        </buttonConfiguration>
+                                        <connections>
+                                            <action selector="reactionChanged:" destination="IvR-2b-9u7" eventType="primaryActionTriggered" id="A94-t9-Hem"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" tag="2" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="TZz-p7-81l">
+                                        <rect key="frame" x="92.333333333333343" y="0.0" width="84.333333333333343" height="34.333333333333336"/>
+                                        <state key="normal" title="Button"/>
+                                        <buttonConfiguration key="configuration" style="filled" image="face.smiling.inverse" catalog="system">
+                                            <color key="baseForegroundColor" systemColor="systemYellowColor"/>
+                                        </buttonConfiguration>
+                                        <connections>
+                                            <action selector="reactionChanged:" destination="IvR-2b-9u7" eventType="primaryActionTriggered" id="gBE-w4-ylm"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" tag="3" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Vbc-DQ-cHw">
+                                        <rect key="frame" x="184.66666666666666" y="0.0" width="83.999999999999972" height="34.333333333333336"/>
+                                        <state key="normal" title="Button"/>
+                                        <buttonConfiguration key="configuration" style="filled" image="questionmark.circle.fill" catalog="system">
+                                            <color key="baseForegroundColor" systemColor="systemYellowColor"/>
+                                        </buttonConfiguration>
+                                        <connections>
+                                            <action selector="reactionChanged:" destination="IvR-2b-9u7" eventType="primaryActionTriggered" id="DQx-3D-HOt"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" tag="4" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="xaG-4a-xge">
+                                        <rect key="frame" x="276.66666666666669" y="0.0" width="84.333333333333314" height="34.333333333333336"/>
+                                        <state key="normal" title="Button"/>
+                                        <buttonConfiguration key="configuration" style="filled" image="hand.thumbsdown.fill" catalog="system">
+                                            <color key="baseForegroundColor" systemColor="systemYellowColor"/>
+                                        </buttonConfiguration>
+                                        <connections>
+                                            <action selector="reactionChanged:" destination="IvR-2b-9u7" eventType="primaryActionTriggered" id="eyO-Ob-vrK"/>
+                                        </connections>
+                                    </button>
+                                </subviews>
+                            </stackView>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="7la-Mb-v77"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="YBS-k3-ljP" firstAttribute="leading" secondItem="eZq-a6-UX0" secondAttribute="leadingMargin" id="50z-4A-a3Q"/>
+                            <constraint firstItem="jul-FT-mMo" firstAttribute="top" secondItem="7la-Mb-v77" secondAttribute="top" constant="12" id="Av4-yi-pad"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="jul-FT-mMo" secondAttribute="trailing" id="KTc-4U-3em"/>
+                            <constraint firstItem="jul-FT-mMo" firstAttribute="leading" secondItem="eZq-a6-UX0" secondAttribute="leadingMargin" id="SZf-lm-MZc"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="YBS-k3-ljP" secondAttribute="trailing" id="lY7-AO-k0G"/>
+                            <constraint firstItem="YBS-k3-ljP" firstAttribute="top" secondItem="jul-FT-mMo" secondAttribute="bottom" constant="8" id="tI7-c0-Zz5"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="commentTextField" destination="jul-FT-mMo" id="DpQ-6s-1GQ"/>
+                        <outlet property="stackView" destination="YBS-k3-ljP" id="VkP-6t-gRl"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="HlJ-uO-Vle" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1482" y="27"/>
+        </scene>
     </scenes>
     <resources>
+        <image name="face.smiling.inverse" catalog="system" width="128" height="123"/>
+        <image name="hand.thumbsdown.fill" catalog="system" width="128" height="121"/>
+        <image name="hand.thumbsup.fill" catalog="system" width="128" height="121"/>
+        <image name="questionmark.circle.fill" catalog="system" width="128" height="123"/>
         <image name="text.bubble" catalog="system" width="128" height="110"/>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+        <systemColor name="systemYellowColor">
+            <color red="1" green="0.80000000000000004" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
     </resources>
 </document>

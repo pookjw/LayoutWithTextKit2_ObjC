@@ -10,7 +10,8 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface TextDocumentViewController : UIViewController
-
+- (void)showCommentPopoverForLayoutFragment:(NSTextLayoutFragment *)layoutFragment;
+- (void)addComment:(NSAttributedString *)comment;
 @end
 
 NS_ASSUME_NONNULL_END

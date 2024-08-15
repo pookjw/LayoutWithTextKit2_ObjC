@@ -13,6 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (retain, nonatomic, nullable) NSTextLayoutManager *textLayoutManager;
 @property (retain, nonatomic, nullable) NSTextContentStorage *textContentStorage;
 - (void)updateContentSizeIfNeeded;
+- (void)addComment:(NSAttributedString *)comment belowParentFragment:(NSTextLayoutFragment *)parentFragment;
 @end
 
 NS_ASSUME_NONNULL_END

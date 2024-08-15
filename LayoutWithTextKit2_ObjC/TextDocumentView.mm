@@ -9,9 +9,12 @@
 #import "TextDocumentViewController.h"
 #import "TextDocumentLayer.h"
 #import "TextLayoutFragmentLayer.h"
+#import "BubbleLayoutFragment.h"
 #import <objc/message.h>
 #import <objc/runtime.h>
 #include <algorithm>
+
+#define PADDING 5.
 
 @interface TextDocumentView () <NSTextLayoutManagerDelegate, NSTextViewportLayoutControllerDelegate>
 @property (retain, readonly, nonatomic) TextDocumentLayer *textDocumentLayer;
@@ -86,7 +89,7 @@
 }
 
 - (void)updateSelectionHighlights {
-    
+    NSLog(@"TODO");
 }
 
 - (void)adjustViewportOffsetIfNeeded {
@@ -188,6 +191,46 @@
     [layer addAnimation:animation forKey:nil];
 }
 
+- (IBAction)handleLongPress:(UILongPressGestureRecognizer *)sender {
+    if (sender.state != UIGestureRecognizerStateBegan) return;
+    
+    TextDocumentViewController *viewController = reinterpret_cast<id (*)(id, SEL)>(objc_msgSend)(self, sel_registerName("_viewControllerForAncestor"));
+    
+    CGPoint longPressPoint = [sender locationInView:self];
+    longPressPoint.x -= PADDING;
+    
+    if (auto layoutFragment = [self.textLayoutManager textLayoutFragmentForPosition:longPressPoint]) {
+        [viewController showCommentPopoverForLayoutFragment:layoutFragment];
+    }
+}
+
+- (void)addComment:(NSAttributedString *)comment belowParentFragment:(NSTextLayoutFragment *)parentFragment {
+    auto fragmentParagraph = static_cast<NSTextParagraph *>(parentFragment.textElement);
+    assert(fragmentParagraph != nil);
+    
+    // 여러 개 추가될 때를 위한 처리
+    NSNumber * _Nullable fragmentDepthValue = [fragmentParagraph.attributedString attribute:@"TK2DemoCommentDepth" atIndex:0 effectiveRange:NULL];
+    NSUInteger fragmentDepth = fragmentDepthValue.unsignedIntegerValue;
+    
+    NSMutableAttributedString *commentWithNewline = [comment mutableCopy];
+    NSAttributedString *newlineAttributedString = [[NSAttributedString alloc] initWithString:@"\n"];
+    [commentWithNewline appendAttributedString:newlineAttributedString];
+    [newlineAttributedString release];
+    
+    [commentWithNewline addAttribute:@"TK2DemoCommentDepth" value:@(fragmentDepth + 1) range:NSMakeRange(0, commentWithNewline.length)];
+    
+    id<NSTextLocation> insertLocation = parentFragment.rangeInElement.endLocation;
+    NSInteger insertIndex = [self.textLayoutManager offsetFromLocation:self.textLayoutManager.documentRange.location toLocation:insertLocation];
+    
+    [self.textContentStorage performEditingTransactionForTextStorage:self.textContentStorage.textStorage usingBlock:^{
+        [self.textContentStorage.textStorage insertAttributedString:commentWithNewline atIndex:insertIndex];
+    }];
+    
+    [commentWithNewline release];
+    
+    [self.layer setNeedsLayout];
+}
+
 
 #pragma mark - NSTextViewportLayoutControllerDelegate
 
@@ -200,8 +243,6 @@
     if (CGSizeEqualToSize(bounds.size, CGSizeZero)) {
         bounds.size = self.bounds.size;
     }
-    
-    NSLog(@"%@", NSStringFromCGRect(bounds));
     
     return bounds;
 }
@@ -219,7 +260,7 @@
         textLayoutFragmentLayer = layer;
         didCreate = NO;
     } else {
-        textLayoutFragmentLayer = [[[TextLayoutFragmentLayer alloc] initWithTextLayoutFragment:textLayoutFragment padding:5.] autorelease];
+        textLayoutFragmentLayer = [[[TextLayoutFragmentLayer alloc] initWithTextLayoutFragment:textLayoutFragment padding:PADDING] autorelease];
         textLayoutFragmentLayer.contentsScale = self.traitCollection.displayScale;
         [self.fragmentLayerMap setObject:textLayoutFragmentLayer forKey:textLayoutFragment];
         [textLayoutFragmentLayer setNeedsDisplay];
@@ -254,6 +295,14 @@
     
     // 뭐하는 코드인지 모르겠음
 //    [self adjustViewportOffsetIfNeeded];
+}
+
+
+#pragma mark - NSTextLayoutManagerDelegate
+
+- (NSTextLayoutFragment *)textLayoutManager:(NSTextLayoutManager *)textLayoutManager textLayoutFragmentForLocation:(id<NSTextLocation>)location inTextElement:(NSTextElement *)textElement {
+    // TODO: BubbleLayoutFragment
+    return [[[NSTextLayoutFragment alloc] initWithTextElement:textElement range:textElement.elementRange] autorelease];
 }
 
 @end
